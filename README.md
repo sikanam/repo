@@ -1,97 +1,94 @@
-# Title: Excel Column Comparison Tool
+# Excel Column Comparison Tool - Detailed Documentation
 
-Owner: Data Operations Team
+## Introduction
 
-## 1. Purpose
+This document provides detailed instructions for using the Excel Column Comparison Tool (`compare_excel.py`). This tool is designed to help you identify differences in column names and positions between two Excel files, making it easy to spot discrepancies that may affect data processing or analysis workflows. The implementation is lightweight and efficient, using only openpyxl for Excel file handling without requiring pandas.
 
-This Standard Operating Procedure (SOP) outlines the process for comparing column names and positions between two Excel files. The Excel Column Comparison Tool addresses the critical need to detect schema discrepancies that could affect data processing workflows, ETL operations, or analysis results. This procedure is designed for data engineers, analysts, and QA specialists who need to validate data structure consistency across different versions of Excel files.
+## Installation
 
-## 2. Scope
+### Prerequisites
 
-This SOP covers the installation, configuration, and usage of the Excel Column Comparison Tool for identifying differences in column structure between Excel files. It applies to all Excel-based data validation processes within the organization but does not cover content comparison or cell-level data validation. This procedure complements existing data quality and ETL validation procedures.
+Before using this tool, ensure you have:
 
-## 3. Roles and Responsibilities
+1. **Python 3.6 or higher** installed on your system
+   - Verify your Python version by running: `python --version`
 
-### Data Engineers
-- Implement and maintain the comparison tool
-- Execute comparisons during ETL development and updates
-- Address identified structural issues in data pipelines
+2. **Required Python packages**
+   - Install all dependencies by running:
+     ```
+     pip install -r requirements.txt
+     ```
+   - This will install:
+     - openpyxl: For Excel file handling
+     - tabulate: Table formatting for reports
 
-### Data Analysts
-- Perform regular schema validation using the tool
-- Document and report structural inconsistencies
-- Verify data migration integrity
+### Downloading the Tool
 
-### QA Specialists
-- Incorporate the tool into automated testing workflows
-- Validate data structure before and after system updates
-- Maintain comparison test suites
-
-## 4. Prerequisites
-
-### System Requirements
-- Python 3.6 or higher installed
-- Read access to Excel files being compared
-- Write access to output location (if saving reports)
-
-### Required Files
-- `compare_excel.py` - Main script file
-- `requirements.txt` - Dependencies file
+The tool consists of three files:
+- `compare_excel.py` - The main script
+- `requirements.txt` - List of dependencies
 - `README.md` - Basic instruction guide
 
-### Required Python Packages
-- openpyxl - For Excel file handling
-- tabulate - For formatting comparison reports
+Ensure all these files are in the same directory for proper functionality.
 
-## 5. Procedure
+## Basic Usage
 
-### 5.1 Installation
+The basic syntax for running the script is:
 
-1. Ensure Python 3.6+ is installed on your system
-   ```
-   python --version
-   ```
+```
+python compare_excel.py FILE1 FILE2 [OPTIONS]
+```
 
-2. Download the tool files to a local directory
-   - `compare_excel.py`
-   - `requirements.txt`
-   - `README.md`
+Where:
+- `FILE1` is the path to the first Excel file
+- `FILE2` is the path to the second Excel file
+- `[OPTIONS]` are additional parameters (see Options section)
 
-3. Install required dependencies
-   ```
-   pip install -r requirements.txt
-   ```
+### Command Line Arguments
 
-### 5.2 Basic Operation
+| Argument | Description |
+|----------|-------------|
+| `file1` | Path to the first Excel file (required) |
+| `file2` | Path to the second Excel file (required) |
+| `-o, --output` | Path to save the report file (optional) |
+| `-h, --help` | Display help information |
 
-1. Open a terminal or command prompt
+## Examples
 
-2. Navigate to the directory containing the script
-   ```
-   cd path\to\script\directory
-   ```
+### Example 1: Basic Comparison
 
-3. Run the comparison with two Excel files
-   ```
-   python compare_excel.py "PATH\TO\FIRST_FILE.xlsx" "PATH\TO\SECOND_FILE.xlsx"
-   ```
+Compare two Excel files and display results in the console:
 
-4. Review the comparison results displayed in the console
+```
+python compare_excel.py "C:\Data\inventory_2024.xlsx" "C:\Data\inventory_2025.xlsx"
+```
 
-5. (Optional) Save the results to a file by adding the output parameter
-   ```
-   python compare_excel.py "PATH\TO\FIRST_FILE.xlsx" "PATH\TO\SECOND_FILE.xlsx" -o "comparison_report.txt"
-   ```
+### Example 2: Save Results to a File
 
-### 5.3 Interpretation of Results
+Compare two Excel files and save the report to a text file:
 
-The comparison report contains several key sections:
+```
+python compare_excel.py "C:\Data\sales_q1.xlsx" "C:\Data\sales_q2.xlsx" -o "comparison_report.txt"
+```
 
-#### 5.3.1 Comparison Summary
+### Example 3: Comparing Files in Different Folders
 
-Review the high-level metrics to assess the scale of differences:
+Compare files located in different directories:
+
+```
+python compare_excel.py "C:\Project A\data.xlsx" "D:\Backup\old_data.xlsx" -o "C:\Reports\diff_report.txt"
+```
+
+## Understanding the Output
+
+The tool generates a comprehensive report with multiple sections:
+
+### 1. Comparison Summary
+
+This section provides a high-level overview of the comparison, including:
+- File names
 - Total columns in each file
-- Number of matching columns
+- Number of matching columns (same name and position)
 - Number of columns with position mismatches
 - Number of columns exclusive to each file
 
@@ -108,10 +105,14 @@ Columns only in File 1: 1
 Columns only in File 2: 3
 ```
 
-#### 5.3.2 Detailed Comparison
+### 2. Detailed Comparison
 
-Examine the comprehensive table showing all columns with their positions and status:
+This section provides a comprehensive table of all columns found in either file, with details on:
+- Column name
+- Position in each file (or N/A if absent)
+- Status (Match, Position Mismatch, Only in File 1, Only in File 2)
 
+Example:
 ```
 === DETAILED COMPARISON ===
 +------------------+--------------------+--------------------+-----------------+
@@ -129,93 +130,182 @@ Examine the comprehensive table showing all columns with their positions and sta
 +------------------+--------------------+--------------------+-----------------+
 ```
 
-#### 5.3.3 Position Mismatches and Exclusive Columns
+### 3. Position Mismatches
 
-Pay special attention to:
-- Position mismatches - Can cause data alignment issues in processing pipelines
-- Exclusive columns - Identify added or removed data fields
+This section focuses on columns that exist in both files but at different positions:
 
-### 5.4 Decision Making
+Example:
+```
+=== POSITION MISMATCHES ===
++------------------+--------------------+--------------------+
+| Column Name      | Position in File 1 | Position in File 2 |
++==================+====================+====================+
+| Sale Date        | 2                  | 4                  |
++------------------+--------------------+--------------------+
+| Total Amount     | 5                  | 7                  |
++------------------+--------------------+--------------------+
+```
 
-1. For position mismatches:
-   - Determine if column reordering is intentional
-   - Update any position-dependent code in data pipelines
-   - Document changes in data dictionary
+### 4. Columns Only in File 1
 
-2. For exclusive columns:
-   - Verify if additions/removals are expected
-   - Update dependent systems to accommodate changes
-   - Consider data completeness implications
+This section lists columns that exist exclusively in the first file:
 
-## 6. Error Handling & Troubleshooting
+Example:
+```
+=== COLUMNS ONLY IN FILE 1 ===
++------------------+--------------------+
+| Column Name      | Position           |
++==================+====================+
+| Old Field        | 3                  |
++------------------+--------------------+
+```
 
-### 6.1 Common Errors
+### 5. Columns Only in File 2
 
-| Error Message | Possible Cause | Resolution |
-|---------------|----------------|------------|
-| `Error: File '...' does not exist.` | Incorrect file path | - Verify the file path is correct<br>- Ensure file names are spelled correctly<br>- Use absolute paths to avoid ambiguity |
-| `Error reading file ...` | File format or access issues | - Ensure the file is a valid Excel file<br>- Check that the file isn't corrupted<br>- Verify you have read permissions<br>- Close the file if it's open in another application |
-| `Error saving report to ...` | Write permission or path issues | - Check write permissions for the output directory<br>- Verify the output path exists<br>- Ensure the file isn't locked by another process |
-| Missing module errors | Dependencies not installed | - Run `pip install -r requirements.txt`<br>- Verify Python environment is activated (if using venv) |
+This section lists columns that exist exclusively in the second file:
 
-### 6.2 Support Resources
+Example:
+```
+=== COLUMNS ONLY IN FILE 2 ===
++------------------+--------------------+
+| Column Name      | Position           |
++==================+====================+
+| New Field        | 2                  |
++------------------+--------------------+
+| Category         | 6                  |
++------------------+--------------------+
+| Discount         | 8                  |
++------------------+--------------------+
+```
 
-If issues persist after attempting the troubleshooting steps:
-- Contact the Data Engineering team via Slack (#data-engineering)
-- Create a ticket in JIRA under the DATA project
-- Reference the tool's README.md for additional troubleshooting steps
+## Technical Implementation
 
-## 7. Monitoring & Maintenance
+The tool's lightweight implementation uses:
 
-### 7.1 Performance Monitoring
+1. **openpyxl** for Excel file handling:
+   - Uses read-only mode for better performance with large files
+   - Only reads the header row, minimizing memory usage
+   - Processes cell values directly without complex data structures
 
-- **Memory Usage:**
-  - The tool is designed to be memory-efficient by reading only header rows
-  - Monitor system memory when comparing very large files (100+ columns)
+2. **Pure Python data structures**:
+   - Uses standard lists and sets for data storage and comparison
+   - Maximizes compatibility across different Python environments
 
-- **Processing Time:**
-  - Most comparisons should complete in seconds
-  - Log execution time for baseline performance tracking
+3. **tabulate** for report formatting:
+   - Creates well-formatted tables with clear boundaries and alignments
+   - Improves readability of comparison results
 
-### 7.2 Regular Maintenance
+## Practical Use Cases
 
-1. **Dependency Updates:**
-   - Check for openpyxl and tabulate updates quarterly
-   - Update requirements.txt after testing with new versions
+### Data Migration Validation
 
-2. **Script Maintenance:**
-   - Review script for improvements every 6 months
-   - Version control changes through Git
+When migrating data between systems, use this tool to ensure the target schema matches the source schema:
 
-### 7.3 Best Practices for Ongoing Use
+```
+python compare_excel.py "source_system_export.xlsx" "target_system_import.xlsx" -o "migration_validation.txt"
+```
 
-- Include comparison reports in change management documentation
-- Run comparisons before and after major data structure changes
-- Integrate the tool into CI/CD pipelines for automated testing
-- Archive comparison reports for audit purposes
+### Tracking Schema Changes Over Time
 
-## 8. References & Related Documents
+Monitor how your data structure evolves between versions:
 
-### 8.1 Related Procedures
-- Data Quality Assurance SOP
-- ETL Validation Process
-- Data Migration Checklist
-- Schema Change Management Procedure
+```
+python compare_excel.py "2024_data_model.xlsx" "2025_data_model.xlsx" -o "yearly_schema_changes.txt"
+```
 
-### 8.2 Technical References
-- Python openpyxl Documentation: https://openpyxl.readthedocs.io/
-- Internal Data Dictionary (Confluence)
-- Corporate Data Governance Standards
+### ETL Validation
 
-### 8.3 Additional Resources
-- Script GitHub Repository
-- Example Comparison Reports
-- Use Case Documentation
+Verify that extract-transform-load processes maintain the expected column structure:
 
----
+```
+python compare_excel.py "pre_etl_data.xlsx" "post_etl_data.xlsx" -o "etl_validation.txt"
+```
 
-**Version History**
+## Troubleshooting
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | May 30, 2025 | Data Operations Team | Initial SOP creation |
+### Common Issues and Solutions
+
+1. **File Not Found Errors**
+   - Ensure the file paths are correct
+   - If paths contain spaces, enclose them in quotes
+   - Use absolute paths when files are in different directories
+
+2. **Permission Errors**
+   - Make sure you have read access to the Excel files
+   - Make sure you have write access to the output directory
+
+3. **Excel Format Issues**
+   - The tool supports various Excel formats (.xlsx, .xls, .xlsm)
+   - If a file is password-protected, remove the protection before comparison
+   - Very old Excel formats (.xls) may need to be converted to .xlsx first
+
+### Error Messages
+
+| Error | Meaning | Solution |
+|-------|---------|----------|
+| `Error: File '...' does not exist.` | The specified file cannot be found | Check the file path and ensure the file exists |
+| `Error reading file ...` | The file exists but cannot be read | Ensure the file is a valid Excel file and not corrupted |
+| `Error saving report to ...` | Cannot write to the output location | Check permissions and ensure the directory exists |
+
+## Performance Considerations
+
+The lightweight implementation offers several performance advantages:
+
+1. **Memory Efficiency**:
+   - Only reads the header row, not the entire file
+   - Uses read-only mode in openpyxl to minimize memory footprint
+   - Well-suited for comparing Excel files with many rows
+
+2. **Speed**:
+   - Direct column comparison without complex data transformations
+   - Minimal dependencies lead to faster startup time
+   - Efficient data structures for quick comparison operations
+
+3. **Large File Handling**:
+   - Can process large Excel files with minimal memory consumption
+   - Focuses only on structural metadata, not content
+
+## Tips for Best Results
+
+1. **Use Consistent Excel Formats**
+   - The tool works best when both files use the same Excel format (.xlsx recommended)
+
+2. **Large Files Considerations**
+   - For very large Excel files with many columns, the script still performs efficiently
+   - The first sheet in the workbook is used by default
+
+3. **Report Analysis**
+   - When analyzing reports, focus first on position mismatches as these can cause the most issues in data processing workflows
+
+4. **Regular Audits**
+   - Use this tool as part of regular data audits to catch schema drift early
+
+## Advanced Usage
+
+### Integrating Into Workflows
+
+This tool can be incorporated into data processing pipelines or automated testing:
+
+```python
+# Example Python script that uses the comparison tool
+import subprocess
+import os
+
+def run_comparison(file1, file2, output=None):
+    cmd = ["python", "compare_excel.py", file1, file2]
+    if output:
+        cmd.extend(["-o", output])
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    return result.stdout
+
+# Call the function as part of a workflow
+comparison_result = run_comparison("new_data.xlsx", "reference_data.xlsx", "comparison.txt")
+if "Position Mismatches: 0" not in comparison_result:
+    print("Warning: Schema has changed!")
+```
+
+## Conclusion
+
+The Excel Column Comparison Tool provides a straightforward yet powerful way to identify discrepancies between Excel files' structures. Its lightweight implementation without pandas dependency makes it efficient and easy to deploy across different environments. By identifying column mismatches early, you can prevent data processing errors and ensure consistency across your data ecosystem.
+
+For any questions or issues not covered in this documentation, please refer to the README.md file or contact your system administrator.
